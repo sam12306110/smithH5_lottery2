@@ -1,0 +1,160 @@
+<template>
+
+    <div v-if="showNavigation" :class="'so-left '+ (showNavigation?'active':'')">
+        <div class="so-shade" @click="close"></div>
+        <!--<div class="so-left-close" @click="close">
+            <img src="../../../static/frist/images/left/left808.png">
+        </div>-->
+        <div class="so-left-con" >
+            <div class="so-l-c-top">
+                <!--<div>
+                    <img src="../../../static/frist/images/left/user.png">
+                </div>-->
+                <div>
+                    <span class="icon icon_user"></span>
+                    <p class="user_name" v-if="haslogin">{{getCookie('username')}}</p>
+                    <div class="purse"  v-if="haslogin">
+                        <span class="icon icon_money"></span>
+                        <div class="so-in-top-sum" >
+                            {{ fortMoney(roundAmt($parent.balanceData ? $parent.balanceData.balance : 0), 2)}}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="so-l-c-con indexside">
+                <div>
+                    <ul>
+                        <li @click="CheckDemoPlay('CZ')">
+                            <a>
+                                <div class="">
+                                    <div>
+                                        <i class="index_s index_s01"></i>
+                                    </div>
+                                </div>
+                                充值
+                            </a>
+                        </li>
+                        <li @click="CheckDemoPlay('TK')">
+                            <a>
+                                <div class="">
+                                    <div>
+                                        <i class="index_s index_s02"></i>
+                                    </div>
+                                </div>
+                                提款
+                            </a>
+                        </li>
+                        <li>
+                            <router-link v-bind:to="'/lobbyTemplate/acdetial'">
+                                <div class="">
+                                    <div>
+                                        <i class="index_s index_s03"></i>
+                                    </div>
+                                </div>
+                                帐户明细
+                            </router-link>
+                        </li>
+                        <li>
+                            <a :href="custUrl" target="_blank" >
+                                <div class="">
+                                    <div>
+                                        <i class="index_s index_s04"></i>
+                                    </div>
+                                </div>
+                                在线客服
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <Confirm ref="confirm" />
+        <AutoCloseDialog ref="autoCloseDialog" text=" " type="" />
+    </div>
+
+</template>
+
+
+<script>
+    import Mixin from '@/Mixin'
+    // import $ from "jquery";
+//    import deposit from '@/components/lobbyTemplate/deposit'
+    import AutoCloseDialog from '@/components/publicTemplate/AutoCloseDialog'
+    import Confirm from '@/components/publicTemplate/Confirm'
+    export default {
+        name: 'IndexNavigation',
+        mixins:[Mixin],
+        props:['el'],
+        components: {
+//            deposit,
+        AutoCloseDialog,
+            Confirm
+        },
+
+        data :function() {
+            return {
+                balanceData:'',
+                haslogin :false ,
+                showNavigation:false ,
+                allLottery:{},
+                mainIndexBalance:'',
+                custUrl:''
+            }
+        },
+        created:function () {
+            this.haslogin = this.ifLogined() ;
+        } ,
+        mounted:function() {
+            var that = this;
+
+            $(this.el).on('click', ()=>{
+                this.showNavigation = true;
+
+                that.mainIndexBalance = that.getCookie('balancePublic');
+//                console.log(  this.mainIndexBalance )
+                // 调接口获取数据 添加到用户余额   
+
+                // console.log(that.lotteryID) 
+                // console.log(that.sys_time) 
+  //               that.priodDataNewly(that.lotteryID, sys_time).then(res=>{
+  // 334                      that.ishwowpriod = true ;           
+
+
+
+                $('html,body').css({'height':'100%','overflow-y':'hidden'}) ; // 禁止页面滚动
+            }) ;
+            this.custUrl=localStorage.getItem('Url');
+
+        },
+        methods:{
+            // 关闭侧滑栏
+            close:function(e){
+                this.showNavigation = false;
+                $('html,body').css({'height':'auto','overflow-y':'scroll'}) ;
+            },
+
+            //判断是否为游客,cla为class
+            CheckDemoPlay:function (cla) {
+                var _self =this;
+                var acType=_self.getCookie('acType');
+                if(acType==2){
+                    _self.$refs.confirm.open();
+                    return
+                }
+                if(cla=='CZ'){
+                    _self.$router.push('/lobbyTemplate/deposit')
+                }
+                if(cla=='TK'){
+                    _self.$router.push('/lobbyTemplate/Withdrawals')
+                }
+            }
+        },
+
+    }
+</script>
+<style scoped>
+.so-shade {
+    display: block;
+    z-index: 0;
+}
+</style>
